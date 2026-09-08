@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TPMS File Generator - Excel to CSV</title>
+  <meta name="description" content="PWA tool to process BEML / Dumper TPMS payload reports (.xls/.xlsx) and export clean CSV files.">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="badge-pwa">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        PWA Offline Ready
+      </div>
+      <div class="title-row">
+        <img src="icons/icon-192.png" alt="TPMS Logo" class="logo-icon">
+        <h1>TPMS File Generator</h1>
+      </div>
+      <p class="subtitle">Convert BEML / Dumper TPMS payload reports (.xls / .xlsx) into standardized, clean CSV files.</p>
+      <button id="btnInstall" class="btn-install">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Install App
+      </button>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button type="button" class="tab-btn active" id="tabConvert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Convert Reports
+      </button>
+      <button type="button" class="tab-btn" id="tabGenerate">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Generate Report
+      </button>
+    </div>
+
+    <!-- VIEW 1: CONVERT EXISTING REPORTS -->
+    <div id="viewConvert">
+      <!-- Dumper Type Selector Card -->
+      <div class="card" style="margin-bottom: 20px;">
+        <label class="section-label" style="margin-bottom: 12px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h1"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+          Select Dumper Model / Report Type
+        </label>
+        <div class="dumper-type-grid">
+          <div class="dumper-type-card active beml" id="typeCardBeml" data-type="BEML">
+            <div class="type-header">
+              <div class="type-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                BEML Dumpers
+              </div>
+              <span class="type-badge badge-beml">BEML 18-COL</span>
+            </div>
+            <div class="type-desc">
+              Parses BEML Excel reports (<code>.xls</code>, <code>.xlsx</code>) &rarr; standard 18-column CSV named <code>&lt;serial&gt;_&lt;month&gt;.csv</code>
+            </div>
+          </div>
+
+          <div class="dumper-type-card cat" id="typeCardCat" data-type="CAT">
+            <div class="type-header">
+              <div class="type-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                CAT Dumpers
+              </div>
+              <span class="type-badge badge-cat">CAT MINESTAR 16-COL</span>
+            </div>
+            <div class="type-desc">
+              Parses Caterpillar MineStar reports (<code>.csv</code>, <code>.xlsx</code>) &rarr; standard 16-column CSV named <code>&lt;Equipment&gt;.csv</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings & Month Selection Card -->
+      <div class="card" id="monthCard">
+        <div class="settings-section">
+          <label class="section-label" for="monthSelect">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Select Output Month (Naming Convention)
+          </label>
+          <div class="month-control-bar">
+            <div class="month-select-wrapper">
+              <select id="monthSelect">
+                <option value="january">January (e.g. 60611_january.csv)</option>
+                <option value="february">February (e.g. 60611_february.csv)</option>
+                <option value="march">March (e.g. 60611_march.csv)</option>
+                <option value="april">April (e.g. 60611_april.csv)</option>
+                <option value="may">May (e.g. 60611_may.csv)</option>
+                <option value="june">June (e.g. 60611_june.csv)</option>
+                <option value="july">July (e.g. 60611_july.csv)</option>
+                <option value="august">August (e.g. 60611_august.csv)</option>
+                <option value="september" selected>September (e.g. 60611_september.csv)</option>
+                <option value="october">October (e.g. 60611_october.csv)</option>
+                <option value="november">November (e.g. 60611_november.csv)</option>
+                <option value="december">December (e.g. 60611_december.csv)</option>
+                <option value="custom">-- Custom Suffix --</option>
+              </select>
+            </div>
+            <div id="customMonthWrapper" class="hidden" style="flex: 1; min-width: 180px;">
+              <input type="text" id="customMonthInput" placeholder="Enter custom suffix...">
+            </div>
+          </div>
+
+          <div class="month-chips" id="quickMonthChips">
+            <button type="button" class="chip" data-month="january">Jan</button>
+            <button type="button" class="chip" data-month="february">Feb</button>
+            <button type="button" class="chip" data-month="march">Mar</button>
+            <button type="button" class="chip" data-month="april">Apr</button>
+            <button type="button" class="chip" data-month="may">May</button>
+            <button type="button" class="chip" data-month="june">Jun</button>
+            <button type="button" class="chip" data-month="july">Jul</button>
+            <button type="button" class="chip" data-month="august">Aug</button>
+            <button type="button" class="chip active" data-month="september">Sep</button>
+            <button type="button" class="chip" data-month="october">Oct</button>
+            <button type="button" class="chip" data-month="november">Nov</button>
+            <button type="button" class="chip" data-month="december">Dec</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Card -->
+      <div class="card">
+        <div class="drop-zone" id="dropZone">
+          <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <div class="drop-title" id="dropTitle">Drag & Drop BEML .xls or .xlsx Files or Folders Here</div>
+          <p class="drop-desc" id="dropDesc">Accepts single files, multiple files, or an entire folder of TPMS reports.</p>
+          <div class="drop-actions">
+            <button type="button" class="btn btn-primary" id="btnSelectFiles">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+              Select File(s)
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnSelectFolder">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              Select Folder
+            </button>
+          </div>
+        </div>
+        <!-- Hidden file inputs -->
+        <input type="file" id="fileInput" multiple accept=".xls,.xlsx,.csv" class="hidden">
+        <input type="file" id="folderInput" webkitdirectory directory multiple accept=".xls,.xlsx,.csv" class="hidden">
+      </div>
+
+      <!-- Queue & Results Section (Hidden until files added) -->
+      <div class="card hidden" id="resultsCard">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-num" id="statFiles">0</div>
+            <div class="stat-label">Files Processed</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statTrips">0</div>
+            <div class="stat-label">Total Cycles</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statTonnage">0</div>
+            <div class="stat-label">Total Tons</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="statAvgPayload">0</div>
+            <div class="stat-label">Avg Payload (T)</div>
+          </div>
+        </div>
+
+        <div class="queue-header">
+          <div class="queue-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Processed Dumper Reports
+          </div>
+          <div class="queue-actions">
+            <button type="button" class="btn btn-consolidate hidden" id="btnDownloadConsolidated">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Download Consolidated CSV
+            </button>
+            <button type="button" class="btn btn-success" id="btnDownloadAll">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download All (ZIP)
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btnClearAll">Clear</button>
+          </div>
+        </div>
+
+        <div class="file-list" id="fileList"></div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: GENERATE NEW REPORT -->
+    <div id="viewGenerate" class="hidden">
+      <div class="card">
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Generate Synthetic TPMS Report
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;" id="genSubtitle">
+          Create realistic TPMS payload workbooks and matching standardized CSVs for any dumper, date, shift, and trip count.
+        </p>
+
+        <!-- Generator Dumper Type Selector -->
+        <div style="margin-bottom: 20px;">
+          <label class="section-label" style="margin-bottom: 12px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v7c0 .6.4 1 1 1h1"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+            Select Dumper Model
+          </label>
+          <div class="dumper-type-grid">
+            <div class="dumper-type-card active beml" id="genTypeBeml" data-type="BEML">
+              <div class="type-header">
+                <div class="type-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                  BEML Dumpers
+                </div>
+                <span class="type-badge badge-beml">BEML 18-COL</span>
+              </div>
+              <div class="type-desc">
+                Synthesize BEML Excel reports (<code>.xlsx</code>) &amp; standard 18-column CSV named <code>&lt;serial&gt;_&lt;month&gt;.csv</code>
+              </div>
+            </div>
+
+            <div class="dumper-type-card cat" id="genTypeCat" data-type="CAT">
+              <div class="type-header">
+                <div class="type-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                  CAT Dumpers
+                </div>
+                <span class="type-badge badge-cat">CAT MINESTAR 16-COL</span>
+              </div>
+              <div class="type-desc">
+                Synthesize Caterpillar MineStar reports (<code>.csv</code>) &amp; standard 16-column CSV named <code>&lt;Equipment&gt;.csv</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form id="genForm">
+          <div class="form-grid">
+            <!-- Dumper Serial -->
+            <div class="form-group">
+              <label for="genSerial" id="genSerialLabel">Dumper Serial Number</label>
+              <input type="text" id="genSerial" value="60611" placeholder="e.g. 60611" required>
+              <div class="month-chips" id="serialChips" style="margin-top: 4px;">
+                <button type="button" class="chip" data-sn="60610">60610</button>
+                <button type="button" class="chip active" data-sn="60611">60611</button>
+                <button type="button" class="chip" data-sn="60643">60643</button>
+                <button type="button" class="chip" data-sn="60644">60644</button>
+                <button type="button" class="chip" data-sn="60645">60645</button>
+                <button type="button" class="chip" data-sn="60646">60646</button>
+                <button type="button" class="chip" data-sn="60647">60647</button>
+                <button type="button" class="chip" data-sn="60648">60648</button>
+                <button type="button" class="chip" data-sn="60904">60904</button>
+                <button type="button" class="chip" data-sn="60905">60905</button>
+                <button type="button" class="chip" data-sn="60906">60906</button>
+                <button type="button" class="chip" data-sn="60907">60907</button>
+                <button type="button" class="chip" data-sn="60926">60926</button>
+              </div>
+            </div>
+
+            <!-- Date -->
+            <div class="form-group">
+              <label for="genDate">Shift Date</label>
+              <input type="date" id="genDate" required>
+            </div>
+
+            <!-- Optional Trips -->
+            <div class="form-group">
+              <label for="genTrips">Number of Trips (Optional)</label>
+              <input type="number" id="genTrips" min="1" max="60" placeholder="Auto (11 to 15 trips)">
+            </div>
+          </div>
+
+          <!-- Shift Selection -->
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label>Operating Shift (Production: +1 hr after start to -1 hr before end)</label>
+            <div class="shift-cards">
+              <div class="shift-card active" data-shift="1">
+                <div class="shift-name">1st Shift</div>
+                <div class="shift-hours">06:00 AM – 02:00 PM</div>
+                <div style="font-size: 0.72rem; color: #a5f3fc; margin-top: 3px;">Production: 07:00 AM – 01:00 PM</div>
+              </div>
+              <div class="shift-card" data-shift="2">
+                <div class="shift-name">2nd Shift</div>
+                <div class="shift-hours">02:00 PM – 10:00 PM</div>
+                <div style="font-size: 0.72rem; color: #a5f3fc; margin-top: 3px;">Production: 03:00 PM – 09:00 PM</div>
+              </div>
+              <div class="shift-card" data-shift="3">
+                <div class="shift-name">3rd Shift</div>
+                <div class="shift-hours">10:00 PM – 06:00 AM</div>
+                <div style="font-size: 0.72rem; color: #a5f3fc; margin-top: 3px;">Production: 11:00 PM – 05:00 AM</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-bar">
+            <button type="submit" class="btn btn-primary" id="btnGenerateReport">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Generate TPMS Report
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Generated Report Results Card (Hidden until generated) -->
+      <div class="card hidden" id="genResultsCard">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-num" id="genStatSN">--</div>
+            <div class="stat-label">Dumper Serial</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="genStatShift">--</div>
+            <div class="stat-label">Shift</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="genStatTrips">0</div>
+            <div class="stat-label">Total Cycles</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="genStatTonnage">0</div>
+            <div class="stat-label">Total Tons</div>
+          </div>
+        </div>
+
+        <div class="queue-header">
+          <div class="queue-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Generated Files
+          </div>
+          <div class="btn-bar">
+            <button type="button" class="btn btn-success btn-sm" id="btnGenDownloadRaw">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span id="btnGenDownloadRawLabel">Download .XLSX</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="btnGenDownloadCsv">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download .CSV
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="btnGenDownloadZip">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Both (ZIP)
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <h3 style="font-size: 0.95rem; color: #cbd5e1; margin-bottom: 10px;">Cycle Data Preview (All Rows)</h3>
+          <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+            <table>
+              <thead id="genThead"></thead>
+              <tbody id="genTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal-backdrop" id="previewModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" id="modalTitle">CSV Preview</div>
+          <button type="button" class="btn-close" id="btnCloseModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="modalMeta" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px;"></p>
+          <div class="table-responsive">
+            <table id="previewTable">
+              <thead id="previewThead"></thead>
+              <tbody id="previewTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Footer -->
+    <footer>
+      TPMS File Generator &bull; Runs 100% Offline &bull; Client-side Processing
+    </footer>
+  </div>
+
+  <!-- Local Offline Libraries -->
+  <script src="libs/xlsx.full.min.js"></script>
+  <script src="libs/jszip.min.js"></script>
+  <!-- Main Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
