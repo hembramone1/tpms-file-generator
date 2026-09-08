@@ -7,8 +7,11 @@ let deferredPrompt = null;
 // Tab Navigation
 const tabConvert = document.getElementById('tabConvert');
 const tabGenerate = document.getElementById('tabGenerate');
+const tabHelp = document.getElementById('tabHelp');
 const viewConvert = document.getElementById('viewConvert');
 const viewGenerate = document.getElementById('viewGenerate');
+const viewHelp = document.getElementById('viewHelp');
+const btnOpenHelp = document.getElementById('btnOpenHelp');
 
 // Generator Form Elements
 const genForm = document.getElementById('genForm');
@@ -363,22 +366,33 @@ function setupEventListeners() {
   });
 
   // Tab Switching
-  tabConvert.addEventListener('click', () => {
-    tabConvert.classList.add('active');
-    tabGenerate.classList.remove('active');
-    viewConvert.classList.remove('hidden');
-    viewGenerate.classList.add('hidden');
-  });
+  function switchTab(target) {
+    tabConvert.classList.toggle('active', target === 'convert');
+    tabGenerate.classList.toggle('active', target === 'generate');
+    if (tabHelp) tabHelp.classList.toggle('active', target === 'help');
 
-  tabGenerate.addEventListener('click', () => {
-    tabGenerate.classList.add('active');
-    tabConvert.classList.remove('active');
-    viewGenerate.classList.remove('hidden');
-    viewConvert.classList.add('hidden');
-    if (!genDate.value) {
+    viewConvert.classList.toggle('hidden', target !== 'convert');
+    viewGenerate.classList.toggle('hidden', target !== 'generate');
+    if (viewHelp) viewHelp.classList.toggle('hidden', target !== 'help');
+
+    if (target === 'generate' && !genDate.value) {
       genDate.value = new Date().toISOString().split('T')[0];
     }
-  });
+  }
+
+  tabConvert.addEventListener('click', () => switchTab('convert'));
+  tabGenerate.addEventListener('click', () => switchTab('generate'));
+  if (tabHelp) {
+    tabHelp.addEventListener('click', () => switchTab('help'));
+  }
+  if (btnOpenHelp) {
+    btnOpenHelp.addEventListener('click', () => {
+      switchTab('help');
+      if (viewHelp) {
+        viewHelp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
 
   // Generator Dumper Type Selector (BEML vs CAT)
   if (genTypeBeml) {

@@ -24,10 +24,16 @@
         <h1>TPMS File Generator</h1>
       </div>
       <p class="subtitle">Convert BEML / Dumper TPMS payload reports (.xls / .xlsx) into standardized, clean CSV files.</p>
-      <button id="btnInstall" class="btn-install">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Install App
-      </button>
+      <div style="display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 14px; flex-wrap: wrap;">
+        <button type="button" id="btnOpenHelp" class="btn btn-secondary btn-sm" style="border-radius: 20px; padding: 8px 18px; font-weight: 600;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          How to Use
+        </button>
+        <button type="button" id="btnInstall" class="btn-install" style="margin-top: 0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Install App
+        </button>
+      </div>
     </header>
 
     <!-- Navigation Tabs -->
@@ -39,6 +45,10 @@
       <button type="button" class="tab-btn" id="tabGenerate">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         Generate Report
+      </button>
+      <button type="button" class="tab-btn" id="tabHelp">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        How to Use
       </button>
     </div>
 
@@ -357,6 +367,155 @@
               <thead id="genThead"></thead>
               <tbody id="genTbody"></tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: INSTRUCTIONS & HELP -->
+    <div id="viewHelp" class="hidden">
+      <!-- Quick Intro Card -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px; flex-wrap: wrap;">
+          <div style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; border-radius: 12px; padding: 12px; display: flex; align-items: center; justify-content: center;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">User Guide &amp; Instructions</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Complete reference for converting TPMS reports, synthesizing shift cycles, and batch consolidation.</p>
+          </div>
+        </div>
+
+        <div class="callout-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <div>
+            <strong>100% Client-Side &amp; Private:</strong> All conversions and synthetic generation run locally inside your web browser. No payload files, truck serials, or tonnages are ever transmitted to any external server.
+          </div>
+        </div>
+      </div>
+
+      <!-- Guide Cards Grid -->
+      <div class="help-sections-grid">
+        <!-- Section 1: Convert Reports -->
+        <div class="card help-card">
+          <div class="help-card-header">
+            <span class="help-step-badge">1</span>
+            <h3 class="help-card-title">Converting Existing Reports</h3>
+          </div>
+          <ol class="help-steps">
+            <li>
+              <strong>Select Dumper Model:</strong>
+              <p>Choose <strong>BEML Dumpers</strong> (for <code>.xls</code> / <code>.xlsx</code> reports) or <strong>CAT Dumpers</strong> (for Caterpillar MineStar <code>.csv</code> reports).</p>
+            </li>
+            <li>
+              <strong>Upload Files or Folders:</strong>
+              <p>Drag and drop your report files or an entire folder directly into the upload area, or click <em>Select File(s)</em> / <em>Select Folder</em>.</p>
+            </li>
+            <li>
+              <strong>Choose Output Month (BEML):</strong>
+              <p>Click any quick month pill (Jan–Dec). BEML filenames automatically update to <code>&lt;serial&gt;_&lt;month&gt;.csv</code> (e.g. <code>60611_september.csv</code>).</p>
+            </li>
+            <li>
+              <strong>Inspect Data (Full Preview):</strong>
+              <p>Click <strong>Preview</strong> on any dumper card to inspect <strong>all rows</strong> in a high-performance scrollable table with sticky headers.</p>
+            </li>
+            <li>
+              <strong>Download Individual or Consolidated CSV:</strong>
+              <p>Download single CSVs, or click <strong>Download Consolidated CSV</strong> (appears when 2+ files are queued) to merge all dumper data into a single continuous file (e.g. <code>August_60611_60645.csv</code>).</p>
+            </li>
+            <li>
+              <strong>Download All (ZIP):</strong>
+              <p>Bundles all individual CSV files plus the consolidated CSV into a single ZIP archive.</p>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Section 2: Generate Synthetic Reports -->
+        <div class="card help-card">
+          <div class="help-card-header">
+            <span class="help-step-badge">2</span>
+            <h3 class="help-card-title">Generating Synthetic Reports</h3>
+          </div>
+          <ol class="help-steps">
+            <li>
+              <strong>Select Model &amp; Serial:</strong>
+              <p>Toggle between <strong>BEML</strong> and <strong>CAT</strong>. Pick a pre-configured serial chip or type a custom dumper equipment ID.</p>
+            </li>
+            <li>
+              <strong>Select Date &amp; Shift:</strong>
+              <p>Choose the shift date and shift. The generator enforces the standard 1-hour mining buffer (+1 hr after start to -1 hr before end):</p>
+              <ul class="help-sublist">
+                <li><strong>1st Shift:</strong> 06:00–14:00 (Production: 07:00–13:00)</li>
+                <li><strong>2nd Shift:</strong> 14:00–22:00 (Production: 15:00–21:00)</li>
+                <li><strong>3rd Shift:</strong> 22:00–06:00 (Production: 23:00–05:00 next day)</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Set Number of Trips (Optional):</strong>
+              <p>Leave blank for automatic realistic trip count (11–14 cycles) or specify your target trip count.</p>
+            </li>
+            <li>
+              <strong>Continuous Hauling Pattern:</strong>
+              <p>Trips execute back-to-back with 0-second idle gaps and a realistic 25–35 min meal break at midpoint for shifts with &ge; 7 trips.</p>
+            </li>
+            <li>
+              <strong>Download Reports:</strong>
+              <p>Download the raw report (<code>.xlsx</code> for BEML or MineStar <code>.csv</code> for CAT), standard converted <code>.csv</code>, or both in a ZIP.</p>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Section 3: PWA & Offline Installation -->
+        <div class="card help-card">
+          <div class="help-card-header">
+            <span class="help-step-badge">3</span>
+            <h3 class="help-card-title">Offline Usage &amp; App Installation</h3>
+          </div>
+          <div class="help-content-block">
+            <p>This tool is an installable <strong>Progressive Web App (PWA)</strong>. Once opened in your browser, all scripts and libraries are cached locally for offline use.</p>
+            <div class="help-info-item">
+              <strong>Desktop (Chrome / Edge):</strong>
+              <p>Click the <strong>Install App</strong> button in the header or the install icon in your browser's address bar to run it like a native desktop app.</p>
+            </div>
+            <div class="help-info-item">
+              <strong>Mobile (Android / iOS):</strong>
+              <p>Tap your browser menu &rarr; <em>Add to Home screen</em> to install the app on your home screen.</p>
+            </div>
+            <div class="help-info-item">
+              <strong>Runs Completely Offline:</strong>
+              <p>You can use the app without an internet connection at any mine site or field office.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Python CLI Quick Reference -->
+        <div class="card help-card">
+          <div class="help-card-header">
+            <span class="help-step-badge">4</span>
+            <h3 class="help-card-title">Python CLI Quick Reference</h3>
+          </div>
+          <div class="help-content-block">
+            <p style="margin-bottom: 6px;">Batch conversions and synthetic generation can also be run directly from terminal:</p>
+
+            <div class="code-snippet-box">
+              <span class="code-comment"># Convert CAT MineStar folder:</span>
+              <code>python convert.py "Test 2 input" -t cat -o "Test 2 output"</code>
+            </div>
+
+            <div class="code-snippet-box">
+              <span class="code-comment"># Convert BEML folder with custom month &amp; consolidate:</span>
+              <code>python convert.py "Test input" -t beml -m august -o "Test output"</code>
+            </div>
+
+            <div class="code-snippet-box">
+              <span class="code-comment"># Generate synthetic CAT report (PRB00914, 12 trips, Shift 1):</span>
+              <code>python generate.py -t cat -s PRB00914 -d 2026-09-08 --shift 1 -n 12 -o "Test 2 output"</code>
+            </div>
+
+            <div class="code-snippet-box">
+              <span class="code-comment"># Generate synthetic BEML report (60611, 14 trips, Shift 1):</span>
+              <code>python generate.py -t beml -s 60611 -d 2026-09-08 --shift 1 -n 14 -o "Test output"</code>
+            </div>
           </div>
         </div>
       </div>
