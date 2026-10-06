@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tpms-generator-v11';
+const CACHE_NAME = 'tpms-generator-v12';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

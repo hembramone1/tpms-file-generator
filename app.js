@@ -1538,19 +1538,19 @@ async function downloadGeneratedZip() {
   }
 }
 
-// Universal Clipboard Copy with HTML and TSV Fallback
-async function copyTableContent(theadEl, tbodyEl, triggerBtns = []) {
-  if (!theadEl || !tbodyEl) return;
-  const thRows = Array.from(theadEl.querySelectorAll('tr'));
+// Universal Clipboard Copy with HTML and TSV Fallback (copies data rows without header)
+async function copyTableContent(theadEl, tbodyEl, triggerBtns = [], includeHeader = false) {
+  if (!tbodyEl) return;
+  const thRows = (includeHeader && theadEl) ? Array.from(theadEl.querySelectorAll('tr')) : [];
   const tbRows = Array.from(tbodyEl.querySelectorAll('tr'));
   const allRows = [...thRows, ...tbRows];
 
-  if (allRows.length === 0 || tbRows.length === 0) {
+  if (tbRows.length === 0) {
     showToast('No table rows available to copy.');
     return;
   }
 
-  // Generate Tab-Separated Values (TSV) for spreadsheets (Excel, Google Sheets)
+  // Generate Tab-Separated Values (TSV) for spreadsheets (Excel, Google Sheets) without header
   const tsvLines = [];
   for (const row of allRows) {
     const cells = Array.from(row.querySelectorAll('th, td'));
@@ -1560,7 +1560,9 @@ async function copyTableContent(theadEl, tbodyEl, triggerBtns = []) {
   const tsvText = tsvLines.join('\n');
 
   // Generate formatted HTML table for rich text (Word, Google Docs, Outlook)
-  const htmlTable = `<table><thead>${theadEl.innerHTML}</thead><tbody>${tbodyEl.innerHTML}</tbody></table>`;
+  const htmlTable = (includeHeader && theadEl)
+    ? `<table><thead>${theadEl.innerHTML}</thead><tbody>${tbodyEl.innerHTML}</tbody></table>`
+    : `<table><tbody>${tbodyEl.innerHTML}</tbody></table>`;
   const rowCount = tbRows.length;
 
   let success = false;
@@ -1608,7 +1610,7 @@ async function copyTableContent(theadEl, tbodyEl, triggerBtns = []) {
 
   if (success) {
     triggerBtns.forEach(btn => flashButtonCopied(btn));
-    showToast(`Copied ${rowCount} rows to clipboard! Ready to paste into Excel.`);
+    showToast(`Copied ${rowCount} rows (no header) to clipboard! Ready to paste into Excel.`);
   } else {
     showToast('Failed to copy table to clipboard. Please allow clipboard permissions.');
   }
