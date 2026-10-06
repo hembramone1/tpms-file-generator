@@ -345,6 +345,10 @@
             Generated Files
           </div>
           <div class="btn-bar">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnGenCopyTableTop" title="Copy entire table to clipboard (TSV format for Excel)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy Table</span>
+            </button>
             <button type="button" class="btn btn-success btn-sm" id="btnGenDownloadRaw">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
               <span id="btnGenDownloadRawLabel">Download .XLSX</span>
@@ -361,9 +365,15 @@
         </div>
 
         <div style="margin-top: 16px;">
-          <h3 style="font-size: 0.95rem; color: #cbd5e1; margin-bottom: 10px;">Cycle Data Preview (All Rows)</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <h3 style="font-size: 0.95rem; color: #cbd5e1; margin: 0;">Cycle Data Preview (All Rows)</h3>
+            <button type="button" class="btn btn-secondary btn-sm" id="btnGenCopyTable" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 0.82rem;" title="Copy entire table to clipboard (TSV format for Excel)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy Table to Clipboard</span>
+            </button>
+          </div>
           <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
-            <table>
+            <table id="genTable">
               <thead id="genThead"></thead>
               <tbody id="genTbody"></tbody>
             </table>
@@ -459,8 +469,8 @@
               <p>Trips execute back-to-back with 0-second idle gaps and a realistic 25–35 min meal break at midpoint for shifts with &ge; 7 trips.</p>
             </li>
             <li>
-              <strong>Download Reports:</strong>
-              <p>Download the raw report (<code>.xlsx</code> for BEML or MineStar <code>.csv</code> for CAT), standard converted <code>.csv</code>, or both in a ZIP.</p>
+              <strong>Download Reports or 1-Click Clipboard Copy:</strong>
+              <p>Click <strong>Copy Table to Clipboard</strong> (or <strong>Copy Table</strong>) to immediately copy all cycle rows in Excel/spreadsheet-ready TSV format with 1 click. You can also download raw files (<code>.xlsx</code> / MineStar <code>.csv</code>), standard converted <code>.csv</code>, or both in a ZIP.</p>
             </li>
           </ol>
         </div>
@@ -526,7 +536,13 @@
       <div class="modal-content">
         <div class="modal-header">
           <div class="modal-title" id="modalTitle">CSV Preview</div>
-          <button type="button" class="btn-close" id="btnCloseModal">&times;</button>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnModalCopyTable" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 0.8rem;" title="Copy entire preview table to clipboard (TSV format for Excel)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy Table</span>
+            </button>
+            <button type="button" class="btn-close" id="btnCloseModal">&times;</button>
+          </div>
         </div>
         <div class="modal-body">
           <p id="modalMeta" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px;"></p>

@@ -12,7 +12,7 @@ A Progressive Web App (PWA) and Python CLI tool designed to parse BEML / Dumper 
 - **Single File or Entire Folder**: Accepts single files, multiple files, or an entire folder of `.xls` / `.xlsx` / `.csv` reports via drag-and-drop or file pickers.
 - **Month Suffix Selection**: Easily select from all 12 months (defaults to lowercase as in `60611_september.csv`) or specify a custom suffix.
 - **Automatic Serial Number Extraction**: Pulls truck serials from BEML metadata cells (`Serial Number: 60611`) or CAT MineStar headers (`Equipment :PRB00914`).
-- **Interactive In-Browser Preview**: Preview all converted cycles and summary metrics (total tonnage, cycles, average payload) in a scrollable table before downloading, dynamically adapted to 18 BEML columns or 16 CAT columns.
+- **Interactive In-Browser Preview & 1-Click Clipboard Copy**: Preview all converted or synthetic cycles in a scrollable table before downloading. Click **"Copy Table to Clipboard"** (or **"Copy Table"**) to copy all rows and headers directly to clipboard in Tab-Separated Values (TSV) format, ready to paste straight into Microsoft Excel or Google Sheets in 1 click!
 - **Batch Export & Consolidated CSV**: Download individual converted CSV files, click **"Download Consolidated CSV"** to get a single unified CSV containing all dumpers (e.g. `August_60611_60645.csv`), or click **"Download All (ZIP)"** to get a complete archive containing all individual CSVs plus the consolidated file.
 - **Python CLI Tools**: Includes `convert.py` for conversion (with `-t/--type` and `-c/--consolidate` options) and `generate.py` for automated synthetic report generation.
 

@@ -32,6 +32,8 @@ const btnGenDownloadRawLabel = document.getElementById('btnGenDownloadRawLabel')
 const btnGenDownloadXlsx = btnGenDownloadRaw;
 const btnGenDownloadCsv = document.getElementById('btnGenDownloadCsv');
 const btnGenDownloadZip = document.getElementById('btnGenDownloadZip');
+const btnGenCopyTableTop = document.getElementById('btnGenCopyTableTop');
+const btnGenCopyTable = document.getElementById('btnGenCopyTable');
 const genTypeBeml = document.getElementById('genTypeBeml');
 const genTypeCat = document.getElementById('genTypeCat');
 const genSerialLabel = document.getElementById('genSerialLabel');
@@ -82,6 +84,7 @@ const modalMeta = document.getElementById('modalMeta');
 const previewThead = document.getElementById('previewThead');
 const previewTbody = document.getElementById('previewTbody');
 const btnCloseModal = document.getElementById('btnCloseModal');
+const btnModalCopyTable = document.getElementById('btnModalCopyTable');
 const toast = document.getElementById('toast');
 
 // BEML 18-Column Headers
@@ -445,6 +448,21 @@ function setupEventListeners() {
   });
 
   btnGenDownloadZip.addEventListener('click', downloadGeneratedZip);
+
+  // Copy Generated Table to Clipboard
+  const genCopyBtns = [btnGenCopyTable, btnGenCopyTableTop].filter(Boolean);
+  genCopyBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      copyTableContent(genThead, genTbody, genCopyBtns);
+    });
+  });
+
+  // Copy Preview Modal Table to Clipboard
+  if (btnModalCopyTable) {
+    btnModalCopyTable.addEventListener('click', () => {
+      copyTableContent(previewThead, previewTbody, [btnModalCopyTable]);
+    });
+  }
 
   // Set default generator date
   if (genDate && !genDate.value) {
@@ -1518,6 +1536,96 @@ async function downloadGeneratedZip() {
       Download Both (ZIP)
     `;
   }
+}
+
+// Universal Clipboard Copy with HTML and TSV Fallback
+async function copyTableContent(theadEl, tbodyEl, triggerBtns = []) {
+  if (!theadEl || !tbodyEl) return;
+  const thRows = Array.from(theadEl.querySelectorAll('tr'));
+  const tbRows = Array.from(tbodyEl.querySelectorAll('tr'));
+  const allRows = [...thRows, ...tbRows];
+
+  if (allRows.length === 0 || tbRows.length === 0) {
+    showToast('No table rows available to copy.');
+    return;
+  }
+
+  // Generate Tab-Separated Values (TSV) for spreadsheets (Excel, Google Sheets)
+  const tsvLines = [];
+  for (const row of allRows) {
+    const cells = Array.from(row.querySelectorAll('th, td'));
+    const line = cells.map(c => c.textContent.replace(/[\t\r\n]+/g, ' ').trim()).join('\t');
+    tsvLines.push(line);
+  }
+  const tsvText = tsvLines.join('\n');
+
+  // Generate formatted HTML table for rich text (Word, Google Docs, Outlook)
+  const htmlTable = `<table><thead>${theadEl.innerHTML}</thead><tbody>${tbodyEl.innerHTML}</tbody></table>`;
+  const rowCount = tbRows.length;
+
+  let success = false;
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      if (window.ClipboardItem) {
+        const textBlob = new Blob([tsvText], { type: 'text/plain' });
+        const htmlBlob = new Blob([htmlTable], { type: 'text/html' });
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/plain': textBlob,
+            'text/html': htmlBlob
+          })
+        ]);
+        success = true;
+      }
+    } catch (e) {
+      // Fallback to writeText if write([ClipboardItem]) is blocked
+      try {
+        await navigator.clipboard.writeText(tsvText);
+        success = true;
+      } catch (err2) {
+        success = false;
+      }
+    }
+  }
+
+  if (!success) {
+    // Universal legacy fallback
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = tsvText;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '-9999px';
+      textarea.setAttribute('readonly', '');
+      document.body.appendChild(textarea);
+      textarea.select();
+      success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+    } catch (err3) {
+      success = false;
+    }
+  }
+
+  if (success) {
+    triggerBtns.forEach(btn => flashButtonCopied(btn));
+    showToast(`Copied ${rowCount} rows to clipboard! Ready to paste into Excel.`);
+  } else {
+    showToast('Failed to copy table to clipboard. Please allow clipboard permissions.');
+  }
+}
+
+function flashButtonCopied(btn, label = 'Copied!') {
+  if (!btn) return;
+  const originalHtml = btn.innerHTML;
+  btn.classList.add('btn-copied');
+  btn.innerHTML = `
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    <span style="color: #22c55e; font-weight: 600;">${label}</span>
+  `;
+  setTimeout(() => {
+    btn.classList.remove('btn-copied');
+    btn.innerHTML = originalHtml;
+  }, 2200);
 }
 
 // Download Helper

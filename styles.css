@@ -977,3 +977,12 @@ input[type="date"]:focus, input[type="number"]:focus {
   user-select: all;
 }
 
+/* Copy button feedback */
+.btn-copied {
+  border-color: rgba(34, 197, 94, 0.7) !important;
+  background: rgba(34, 197, 94, 0.16) !important;
+  color: #22c55e !important;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.3) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
